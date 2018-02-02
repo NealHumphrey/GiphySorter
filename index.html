@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Lato:300,400,900' rel='stylesheet' type='text/css'>
+
+    <title>Giphy Sorter</title>
+    
+    <!--Front end framework is Vue.js-->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+
+    <!--Our mobile responsive framework, as well as default styling:-->
+    <!--Using semantic ui - their grid system is a little harder to use than others but I won't need much grid behavior in this-->
+    <script
+        src="http://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script 
+        src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.14/semantic.min.js"></script>
+    <link rel='stylesheet' type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.14/semantic.min.css">
+
+    <link rel="stylesheet" href="main.css">
+
+
+</head>
+<body>
+    <div id="giphysorter">
+
+        <div class="sixteen column doubling ui grid">
+            <template v-for="(s,i) in selected">
+                <div class="column">
+                    <img src="http://via.placeholder.com/350x350"/>
+                </div>
+            </template>
+            
+            <div class="equal width row">
+                <div class="column"></div>
+                <div class="column"></div>
+            </div>
+        </div>
+        
+        <div class="ui one column grid">
+            <div class="column">
+                <button @click="addItem">Add</button>
+                <input v-on:keyup="addItem" type="text">
+            </div>
+        </div>
+    </div>
+
+<!--Our custom JS - after DOM has loaded-->
+<script src="GiphySorter.js"></script>
+
+
+</body>
+</html>
