@@ -36,34 +36,42 @@
     <div class="container">
         <div id="giphysorter">
 
-            
+            <!--selected items list-->
             <div id="selectedPanel">
                 <div class="row">
-                    <template v-for="img in selected">
-                        <div class="col-sm-1">
-                            <img :src="img.images[imgVersion].url"/>
+                    <template v-for="(img, i) in selected">
+                        <div class="col-sm-2 col-6">
+                            <img :src="img.images[imgHoverVersion].url"
+                                 @click="removeFromSelection(img,$event,i)" />
                         </div>
                     </template>
                 </div>
             </div>
             
+            <!--searchbar section-->
             <div class="ui one column grid">
                 <div class="column">
-                    <input v-on:keyup.enter="search" type="text">
-                    <button @click="search">Search</button><!--todo need to send the input data instead of this event data-->
+                    <input id="searchbar" v-on:keyup.enter="search" type="text">
+                    <button v-if="searchResults.length > 0"
+                            @click="clearSearch">Clear Results</button>
                 </div>
             </div>
 
+            <!--search results-->
             <div id="resultPanel">
                 <div class="row">
-                <template v-for="img in searchResults">
+                <template v-for="(img, i) in searchResults">
                     <div class="col-sm-3 col-xs-6">
-                        <img @click="addToSelection(img,$event)"
-                             @mouseover="toggleHover(img,$event,1)"
-                             @mouseout="toggleHover(img,$event,0)"
-                             :src="img.images[imgVersion].url"/>
+                        <div class="result-container">
+                            <img @click="moveHighlight(i)"
+                                 @mouseover="toggleHover(img,$event,1)"
+                                 @mouseout="toggleHover(img,$event,0)"
+                                 :class="[{highlighted: i == highlightedResultIndex}, 'result']"
+                                 :src="img.images[imgVersion].url"/>
+                        </div>
                     </div>
                 </template>
+                <p v-if="searchResults.length == 0 && searchCount > 0">No Results</p>
                 </div>
             </div>
 
