@@ -17,6 +17,7 @@ html, body {
 }
 .full-height{
     height:100%;
+    overflow-y:auto;
 }
 .navbar {
     position:absolute;
@@ -26,6 +27,7 @@ html, body {
     z-index:100;
 
 }
+
 #resultPanel {
     box-sizing: border-box;
     padding-top:60px;
@@ -64,6 +66,10 @@ html, body {
 #selectedPanel h2 {
     font-size: 1rem;
     padding-top:10px;
+    color: #fff;
+}
+#resultPanel p,
+#selectedPanel p {
     color: #fff;
 }
 /*fixes button height - TODO this is probably a hack and would
