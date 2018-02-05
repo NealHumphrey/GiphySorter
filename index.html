@@ -5,78 +5,109 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href='https://fonts.googleapis.com/css?family=Lato:300,400,900' rel='stylesheet' type='text/css'>
 
-    <title>Giphy Sorter</title>
+    <title>GiphySorter</title>
     
     <!--Front end framework is Vue.js-->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
 
-    <!--Our mobile responsive framework, as well as default styling:-->
-    <!--Using semantic ui - their grid system is a little harder to use than others but I won't need much grid behavior in this-->
+    <!--Bootstrap-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <script
         src="http://code.jquery.com/jquery-3.3.1.min.js"
         integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
-    <script 
-        src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.14/semantic.min.js"></script>
-    <link rel='stylesheet' type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.14/semantic.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
 
-    <!--Bootstrap-->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"/>
-    
-    <!--Image carousel plugin. No need to reinvent the wheel-->
-    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick.css"/>
-    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick-theme.css"/>
-    <script type="text/javascript" src="//cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick.min.js"></script>
+    <!--Keys - from https://github.com/michaelhue/keyscss-->
+    <link rel="stylesheet" href="keys.css" type="text/css" />
 
     <!--Custom stuff-->
     <link rel="stylesheet" href="main.css">
 </head>
 <body>
-    <div class="container">
-        <div id="giphysorter">
+    <div id="giphysorter" class="full-height">
+        <nav class="navbar navbar-inverse bg-inverse">
+            <h1 class="navbar-brand">GiphySorter</h1>
 
-            <!--selected items list-->
-            <div id="selectedPanel">
-                <div class="row">
-                    <template v-for="(img, i) in selected">
-                        <div class="col-sm-2 col-6">
-                            <img :src="img.images[imgHoverVersion].url"
-                                 @click="removeFromSelection(img,$event,i)" />
-                        </div>
-                    </template>
-                </div>
-            </div>
-            
-            <!--searchbar section-->
-            <div class="ui one column grid">
-                <div class="column">
-                    <input id="searchbar" v-on:keyup.enter="search" type="text">
-                    <button v-if="searchResults.length > 0"
+        </nav>
+    
+        <div class="container-fluid full-height bg-primary">
+            <div class="row full-height">
+                
+                <!--search results-->
+                <div class="col-sm-3 col-12 custom-scroll" id="resultPanel">
+                    <!--searchbar section-->
+                    <h1>Find your next GIF:</h1>
+                    <input class="form-control" id="searchbar" placeholder="Search" v-on:keyup.enter="search" type="text">
+                    <br>
+                    <button type="button" class="btn btn-info btn-block" v-if="searchResults.length > 0"
                             @click="clearSearch">Clear Results</button>
-                </div>
-            </div>
+                    <br>
 
-            <!--search results-->
-            <div id="resultPanel">
-                <div class="row">
-                <template v-for="(img, i) in searchResults">
-                    <div class="col-sm-3 col-xs-6">
-                        <div class="result-container">
-                            <img @click="moveHighlight(i)"
-                                 @mouseover="toggleHover(img,$event,1)"
-                                 @mouseout="toggleHover(img,$event,0)"
-                                 :class="[{highlighted: i == highlightedResultIndex}, 'result']"
-                                 :src="img.images[imgVersion].url"/>
-                        </div>
+                    <template v-for="(img, i) in searchResults">
+                            <div class="result-container">
+                                <img @click="moveHighlight(i)"
+                                     @mouseover="toggleHover(img,$event,1)"
+                                     @mouseout="toggleHover(img,$event,0)"
+                                     :class="[{highlighted: i == highlightedResultIndex}, 'result']"
+                                     :src="img.images[imgVersion].url"/>
+                            </div>
+                    </template>
+                    <p v-if="searchResults.length == 0 && searchCount > 0">No Results</p>
+                    
+                </div>
+
+                <!--Preview panel-->
+                <div class="col-sm-6 col-12" id="previewPanel">
+                    <div v-if="!searchResults.length">
+                        <h1>The Giphy Sorter</h1>
+                        <p>Find your next awesome GIF! Enter a search term, press enter and see your results.</p>
+
                     </div>
-                </template>
-                <p v-if="searchResults.length == 0 && searchCount > 0">No Results</p>
+                    <div v-if="searchResults.length">
+                        <br>
+                        <button type="button" 
+                                class="btn btn-success"
+                                @click="addToSelection(searchResults[highlightedResultIndex],highlightedResultIndex)">Save</button>
+                        <button type="button"
+                                class="btn btn-warning"
+                                @click="removeFromResults(highlightedResultIndex)">Remove</button>
+                        <br>
+                        <br>
+                        <div class="margin-bottom">
+                            <img :src="searchResults[highlightedResultIndex].images[imgPreviewVersion].url"/>
+                        </div>
+                        <input  class="form-control" 
+                                type="text" 
+                                :value="searchResults[highlightedResultIndex].images[imgPreviewVersion].url"
+                                onClick="this.select();"/>
+                    </div>
+
+                    <h2>Use your keyboard to sort the images:</h2>
+                    <p><kbd class="light">&#x2193;</kbd>: Select next result image</p>
+                    <p><kbd class="light">&#x2191;</kbd>: Select previous result image</p>
+                    <p><kbd class="light">&#x2192;</kbd>: Save image</p>
+                    <p><kbd class="light">&#x2190;</kbd>: Discard image</p>
+                    <p><kbd class="light">ctrl</kbd> + <kbd class="light">z</kbd>: Undo last discard</p> 
+                </div>
+
+                <!--selected items list-->
+                <div class="col-sm-3 col-12 custom-scroll" id="selectedPanel">
+                    <h1>Saved Gifs</h1>
+                    <h2>(click to remove)</h2>
+                    <div class="row">
+                        <template v-for="(img, i) in selected">
+                            <div class="col-sm-12 col-12">
+                                <div class="result-container">
+                                    <img :src="img.images[imgHoverVersion].url"
+                                         @click="removeFromSelection(img,$event,i)" />
+                                </div>
+                            </div>
+                        </template>
+                    </div>
                 </div>
             </div>
-
-            
-            
         </div>
     </div>
 <!--Our custom JS - after DOM has loaded-->

@@ -9,6 +9,7 @@ var vm = new Vue({
         searchUrl: 'https://api.giphy.com/v1/gifs/search',
         imgVersion: 'fixed_width_still',
         imgHoverVersion: 'fixed_width',
+        imgPreviewVersion: 'original',
         removedImageResults: {img:null, index:null}, //most recently removed image, to allow for undo
         removedImageSelected: {img:null, index:null} //most recently removed image, to allow for undo
     },
@@ -44,7 +45,7 @@ var vm = new Vue({
               data: {
                 api_key:this.api_key,
                 q: searchTerms,
-                limit: 10,
+                limit: 20,
                 rating:"pg"
               },
               success: function(response){
@@ -86,10 +87,12 @@ var vm = new Vue({
                 if (direction =="+"){
                     if (this.highlightedResultIndex < (this.searchResults.length - 1)){ //keep highlight within the results bounds
                         this.highlightedResultIndex++;
+                        this.scrollResults(this.highlightedResultIndex);
                     };
                 } else if (direction == "-"){
                     if (this.highlightedResultIndex > 0){ //keep highlight within results bounds
                         this.highlightedResultIndex--;
+                        this.scrollResults(this.highlightedResultIndex);
                     };
                 } else {
                     console.log("incrementHighlight parameter error - should be '+' or '-'.");
@@ -103,6 +106,30 @@ var vm = new Vue({
          */
         moveHighlight: function(i){
             this.highlightedResultIndex = i;
+            this.scrollResults(this.highlightedResultIndex);
+        },
+        /**
+         * Scrolls the #resultPanel so that the currently selected image is at the top.
+         * This is a quick and easy way to do this but relies on the search result heights.
+         * It would be more robust and reusable to rewrite this to pull the height data from the DOM instead
+         */
+        scrollResults: function(i){
+            var height = 0;
+            cssVerticalMargin = 10;
+            //Sum up the heights of all the images before this
+            //If it's the first image, just scroll to zero position so the searchbar is shown
+            if(i != 0){
+                for (var j=0;j<=i;j++){
+                    height += cssVerticalMargin + parseInt(this.searchResults[j].images[this.imgVersion].height);
+                    console.log(height);
+                };
+            };
+            
+            console.log("scrolling by " + height)
+            console.log($('#resultPanel').scrollTop())
+            $('#resultPanel').animate({
+                        scrollTop: height // $('#resultPanel').scrollTop() +
+                    }, 500)
         },
         /** 
          * Performs data validation on the highlightedResultIndex to make sure it's within bounds
@@ -195,28 +222,37 @@ var vm = new Vue({
 //Add Global listeners for key press
 /* When the user has search results available, we want to be able to sort them with 
  * the keyboard to make reviewing the resulting images quick. 
- * - left/right arrow keys move the selected image higlighter
- * - up arrow key moves items into the data.selected list (the 'favorites' section)
- * - down arrow key deletes an item from the searchResults, to remove clutter of undesireable images
+ * - up/down arrow keys move the selected image higlighter
+ * - right arrow key moves items into the data.selected list (the 'favorites' section)
+ * - left arrow key deletes an item from the searchResults, to remove clutter of undesireable images
  * - ctrl+z adds a (very basic) undo function for removal. 
  */
 window.addEventListener('keydown',function(event){
     
     if (event.target.tagName != "INPUT") { //don't want to keypresses to act if we're typing
-        if (event.key == "ArrowLeft"){
+        //Move highlight to previous image
+        if (event.key == "ArrowUp"){
+            event.preventDefault();
             vm.incrementHighlight('-');
-        } else if (event.key == "ArrowRight"){
+        //Move highlight to next image
+        } else if (event.key == "ArrowDown"){
+            event.preventDefault();
             vm.incrementHighlight('+');
-        } else if (event.key == "ArrowUp") {
+        //Save to favorites
+        } else if (event.key == "ArrowRight") {
+            event.preventDefault();
             if (vm.searchResults.length > 0){
                 var img = vm.searchResults[vm.highlightedResultIndex];
                 var i = vm.highlightedResultIndex;
                 vm.addToSelection(img, i);
             };
-        } else if (event.key == "ArrowDown") {
+        //Discard image
+        } else if (event.key == "ArrowLeft") {
+            event.preventDefault();
             if (vm.searchResults.length > 0){
                 vm.removeFromResults(vm.highlightedResultIndex);
             };
+        //Undo the last discard
         } else if (event.key == "z" && event.ctrlKey) {
             event.preventDefault(); //in this app, this just disables undoing typing in the search bar
             //TODO check if we have most recently removed from the search results or the selected
