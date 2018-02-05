@@ -10,6 +10,7 @@ img.highlighted {
 
 .result-container {
     margin-top: 10px;
+    max-width: 200px; /*this is width of the 'fixed_width' img version*/
 }
 html, body {
     height:100%;
